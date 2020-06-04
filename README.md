@@ -1,1 +1,1 @@
-# minor-variants
+Code for minor variant analysis.
