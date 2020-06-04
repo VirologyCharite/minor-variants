@@ -75,7 +75,7 @@ def getBaseFrequencies(bamFile):
 
             result[column.reference_pos] = bases
 
-        for position in range(max(result)):
+        for position in range(referenceLengths[referenceId]):
             if position not in result:
                 result[position] = Counter({'A': 0, 'T': 0, 'G': 0, 'C': 0})
 

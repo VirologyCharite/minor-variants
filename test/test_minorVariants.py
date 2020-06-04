@@ -25,7 +25,7 @@ class TestMinorVariantInfo(TestCase):
                            264, 262, 263, 263, 264, 264, 265, 264, 263, 268,
                            270, 273, 271, 272, 266, 258, 258, 272, 267, 276,
                            272, 273, 271, 275, 268, 267, 266, 263, 232, 205,
-                           192, 192, 190, 175, 174]
+                           192, 192, 190, 175, 174, 171]
         self.assertEqual(coveragePerBase, mvi.coveragePerBase)
 
     def testCoveragePerBasePartialCoverage(self):
@@ -42,7 +42,7 @@ class TestMinorVariantInfo(TestCase):
                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                           1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         self.assertEqual(coveragePerBase, mvi.coveragePerBase)
 
     def testMaxFreqPerBaseCompleteCoverage(self):
@@ -69,7 +69,7 @@ class TestMinorVariantInfo(TestCase):
                           1.0, 1.0, 1.0, 1.0, 1.0, 0.9963636363636363, 1.0,
                           1.0, 1.0, 0.9961977186311787, 1.0,
                           0.9951219512195122, 1.0, 0.9947916666666666, 1.0,
-                          0.9942857142857143, 1.0]
+                          0.9942857142857143, 1.0, 1.0]
         self.assertEqual(maxFreqPerBase, mvi.maxFreqPerBase)
 
     def testMaxFreqPerBasePartialCoverage(self):
@@ -91,7 +91,7 @@ class TestMinorVariantInfo(TestCase):
                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0,
                           1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                          1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+                          1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         self.assertEqual(maxFreqPerBase, mvi.maxFreqPerBase)
 
     def testMeanCoverageCompleteCoverage(self):
@@ -101,7 +101,7 @@ class TestMinorVariantInfo(TestCase):
         """
         bamFile = join(DATADIR, 'complete-coverage-sorted.bam')
         mvi = MinorVariantInfo(bamFile=bamFile)
-        self.assertEqual(205.59595959595958, mvi.meanCoverage())
+        self.assertEqual(205.25, mvi.meanCoverage())
 
     def testMeanCoveragePartialCoverage(self):
         """
@@ -110,4 +110,4 @@ class TestMinorVariantInfo(TestCase):
         """
         bamFile = join(DATADIR, 'partial-coverage-sorted.bam')
         mvi = MinorVariantInfo(bamFile=bamFile)
-        self.assertEqual(1.069767441860465, mvi.meanCoverage())
+        self.assertEqual(1.0692307692307692, mvi.meanCoverage())

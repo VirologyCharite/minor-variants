@@ -34,9 +34,11 @@ class MinorVariantInfo():
             raise ('At least one out of bamFile, jsonFile, or frequenciesDict '
                    'must be specified.')
 
+        self.coveragePerBase = []
+        for position in range(len(self.countsPerBase)):
+            self.coveragePerBase.append(self.countsPerBase[position])
         self.coveragePerBase = [sum(self.countsPerBase[i].values()) for i in
-                                range(max(self.countsPerBase)) if
-                                len(self.countsPerBase[i].values()) > 0]
+                                range(len(self.countsPerBase))]
 
         self.length = len(self.coveragePerBase)
 
@@ -51,6 +53,8 @@ class MinorVariantInfo():
             else:
                 frequency = 0.0
             self.maxFreqPerBase.append(frequency)
+
+        assert self.length == len(self.countsPerBase)
 
     def save(self, outFilename=False):
         """
@@ -130,38 +134,44 @@ class MinorVariantInfo():
         """
         Return an array as used by scikit-allel.
         """
-        P2C = {'A': 0, 'C': 1, 'T': 2, 'G': 3}
-        C2P = {0: 'A', 1: 'C', 2: 'T', 3: 'G'}
-        alleleCounts = []
-        align_pos = 1
-        for position in ref_record:
+        bToC = {'A': 0, 'C': 1, 'T': 2, 'G': 3}
+
+        allelArray = []
+        for position in range(len(self.countsPerBase)):
             alleles = [0, 0, 0, 0]
-            if not np.isnan(align_index[align_pos]):
-                for seq in seqs:
-                    if seq[align_pos-1] in P2C:
-                        alleles[P2C[seq[align_pos-1]]] += 1
+            for base, count in self.countsPerBase[position].items():
+                alleles[bToC[base]] += count
+            allelArray.append(alleles)
 
+        return allel.AlleleCountsArray(allelArray)
 
-        allele_counts.append(alleles)
-    align_pos += 1
-allel1 = allel.AlleleCountsArray(allele_counts)
-
-    def nucleotideDiversity(self, perPosition=False, overall=False,
-                            offsets=False):
+    def nucleotideDiversity(self, perPosition=False, offsets=False):
         """
         Calculate the nucleotide diversity pi.
 
         @param perPosition: if C{True} calculate the nucleotide diversity per
             position and return a list of the nucleotide diversity at each
             position.
-        @param overall: if C{True}, calculate the nucleotide diversity across
-            the entire sequence.
         @param offsets: if not C{False} a C{tuple} of 0-based start, stop
             offsets between which the nucleotide diversity should be computed.
         """
+        assert perPosition != offsets, ("Only one of 'perPosition' and "
+                                        "'offsets' should be specified.")
+
+        alleleCountsArray = self.allelArray()
+
         if perPosition:
             result = []
-            for position in self.countsPerBase:
-                # calculate dif.
+            for position in range(self.length):
+                pi = allel.sequence_diversity(list(range(self.length)),
+                                              alleleCountsArray,
+                                              start=position, stop=position)
                 result.append(pi)
 
+        if offsets:
+            result = allel.sequence_diversity(list(range(self.length)),
+                                              alleleCountsArray,
+                                              start=offsets[0],
+                                              stop=offsets[1])
+
+        return result
