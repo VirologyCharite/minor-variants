@@ -45,6 +45,45 @@ class TestMinorVariantInfo(TestCase):
                            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         self.assertEqual(coveragePerBase, mvi.coveragePerBase)
 
+    def testCoveragePerBaseDeletion(self):
+        """
+        coveragePerBase must be correct when the reads have a deletion relative
+        to the reference.
+        """
+        bamFile = join(DATADIR, 'complete-coverage-deletion-sorted.bam')
+        mvi = MinorVariantInfo(bamFile=bamFile)
+        coveragePerBase = [2, 8, 19, 30, 37, 38, 46, 48, 0, 54, 56, 56, 65, 72,
+                           73, 76, 107, 136, 143, 150, 161, 176, 177, 185, 196,
+                           196, 196, 199, 207, 207, 208, 208, 209, 210, 211,
+                           218, 219, 224, 228, 238, 241, 241, 241, 246, 246,
+                           246, 251, 252, 257, 257, 260, 264, 264, 264, 264,
+                           264, 266, 264, 265, 265, 265, 265, 265, 264, 264,
+                           262, 263, 263, 264, 264, 265, 264, 263, 268, 270,
+                           273, 271, 272, 266, 258, 258, 272, 267, 276, 272,
+                           273, 271, 275, 268, 267, 266, 263, 232, 205, 192,
+                           192, 190, 175, 174, 171]
+        self.assertEqual(coveragePerBase, mvi.coveragePerBase)
+
+    def testCoveragePerBaseInsertion(self):
+        """
+        coveragePerBase must be correct when the reads have a insertion
+        relative to the reference.
+        NOTE THAT THE INSERTED POSITION ISN'T PART OF WHAT IS RETURNED!
+        """
+        bamFile = join(DATADIR, 'complete-coverage-insertion-sorted.bam')
+        mvi = MinorVariantInfo(bamFile=bamFile)
+        coveragePerBase = [2, 8, 19, 30, 37, 38, 46, 48, 50, 54, 56, 56, 65,
+                           72, 73, 76, 107, 136, 143, 150, 161, 176, 177, 185,
+                           196, 196, 196, 199, 207, 207, 208, 208, 209, 210,
+                           211, 218, 219, 224, 228, 238, 241, 241, 241, 246,
+                           246, 246, 251, 252, 257, 257, 260, 264, 264, 264,
+                           264, 264, 266, 264, 265, 265, 265, 265, 265, 264,
+                           264, 262, 263, 263, 264, 264, 265, 264, 263, 264,
+                           265, 265, 262, 257, 247, 238, 227, 224, 218, 217,
+                           211, 211, 209, 213, 206, 205, 12, 10, 10, 10, 10,
+                           10, 10, 10, 10, 10]
+        self.assertEqual(coveragePerBase, mvi.coveragePerBase)
+
     def testMaxFreqPerBaseCompleteCoverage(self):
         """
         maxFreqPerBase must be correct when the reference is completely

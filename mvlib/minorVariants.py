@@ -2,7 +2,7 @@ import json
 import numpy as np
 import sys
 
-import allel
+# import allel
 
 from mvlib.functions import getBaseFrequencies, isMinorVariantPosition
 
@@ -17,8 +17,12 @@ class MinorVariantInfo():
     @param jsonFile: If not C{None}, a C{str} filename of a json file that
         contains the result of getBaseFrequencies().
     @param frequenciesDict: A C{dict} as returned by getBaseFrequencies().
+    @param minBaseQuality: Minimum base quality. Bases below the minimum
+        quality will not be output.
+    @param minMappingQuality: Only use reads above a minimum mapping quality.
     """
-    def __init__(self, bamFile=None, jsonFile=None, frequenciesDict=False):
+    def __init__(self, bamFile=None, jsonFile=None, frequenciesDict=False,
+                 minBaseQuality=0, minMappingQuality=0):
         if frequenciesDict:
             self.countsPerBase = frequenciesDict
             self.name = None
@@ -130,48 +134,48 @@ class MinorVariantInfo():
 
         return distance
 
-    def allelArray(self):
-        """
-        Return an array as used by scikit-allel.
-        """
-        bToC = {'A': 0, 'C': 1, 'T': 2, 'G': 3}
+    # def allelArray(self):
+    #     """
+    #     Return an array as used by scikit-allel.
+    #     """
+    #     bToC = {'A': 0, 'C': 1, 'T': 2, 'G': 3}
 
-        allelArray = []
-        for position in range(len(self.countsPerBase)):
-            alleles = [0, 0, 0, 0]
-            for base, count in self.countsPerBase[position].items():
-                alleles[bToC[base]] += count
-            allelArray.append(alleles)
+    #     allelArray = []
+    #     for position in range(len(self.countsPerBase)):
+    #         alleles = [0, 0, 0, 0]
+    #         for base, count in self.countsPerBase[position].items():
+    #             alleles[bToC[base]] += count
+    #         allelArray.append(alleles)
 
-        return allel.AlleleCountsArray(allelArray)
+    #     return allel.AlleleCountsArray(allelArray)
 
-    def nucleotideDiversity(self, perPosition=False, offsets=False):
-        """
-        Calculate the nucleotide diversity pi.
+    # def nucleotideDiversity(self, perPosition=False, offsets=False):
+    #     """
+    #     Calculate the nucleotide diversity pi.
 
-        @param perPosition: if C{True} calculate the nucleotide diversity per
-            position and return a list of the nucleotide diversity at each
-            position.
-        @param offsets: if not C{False} a C{tuple} of 0-based start, stop
-            offsets between which the nucleotide diversity should be computed.
-        """
-        assert perPosition != offsets, ("Only one of 'perPosition' and "
-                                        "'offsets' should be specified.")
+    #     @param perPosition: if C{True} calculate the nucleotide diversity per
+    #         position and return a list of the nucleotide diversity at each
+    #         position.
+    #     @param offsets: if not C{False} a C{tuple} of 0-based start, stop
+    #         offsets between which the nucleotide diversity should be computed.
+    #     """
+    #     assert perPosition != offsets, ("Don't use 'perPosition' and "
+    #                                     "'offsets' at the same time.")
 
-        alleleCountsArray = self.allelArray()
+    #     alleleCountsArray = self.allelArray()
 
-        if perPosition:
-            result = []
-            for position in range(self.length):
-                pi = allel.sequence_diversity(list(range(self.length)),
-                                              alleleCountsArray,
-                                              start=position, stop=position)
-                result.append(pi)
+    #     if perPosition:
+    #         result = []
+    #         for position in range(self.length):
+    #             pi = allel.sequence_diversity(list(range(self.length)),
+    #                                           alleleCountsArray,
+    #                                           start=position, stop=position)
+    #             result.append(pi)
 
-        if offsets:
-            result = allel.sequence_diversity(list(range(self.length)),
-                                              alleleCountsArray,
-                                              start=offsets[0],
-                                              stop=offsets[1])
+    #     if offsets:
+    #         result = allel.sequence_diversity(list(range(self.length)),
+    #                                           alleleCountsArray,
+    #                                           start=offsets[0],
+    #                                           stop=offsets[1])
 
-        return result
+    #     return result

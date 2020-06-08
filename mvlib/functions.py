@@ -35,13 +35,16 @@ def isMinorVariantPosition(bases, minDepth, minFrequency):
         return False
 
 
-def getBaseFrequencies(bamFile):
+def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
     """
     Takes a bam file and returns a dictionary where the key maps to a position
     and the values map to a Counter with the number of each base at that
     position.
 
     @param bamFile: A C{str} filename of a bam file.
+    @param minBaseQuality: Minimum base quality. Bases below the minimum
+        quality will not be output.
+    @param minMappingQuality: Only use reads above a minimum mapping quality.
     """
     reads = Reads().filter()
 
@@ -65,7 +68,10 @@ def getBaseFrequencies(bamFile):
                           bamFile, len(referenceLengths),
                           ', '.join(sorted(referenceLengths))))
 
-        for column in sam.pileup(reference=referenceId, min_base_quality=0):
+        for i, column in enumerate(sam.pileup(
+                                   reference=referenceId,
+                                   min_base_quality=minBaseQuality,
+                                   min_mapping_quality=minMappingQuality)):
             bases = Counter()
             for read in column.pileups:
                 if (not read.is_del and not read.is_refskip and
