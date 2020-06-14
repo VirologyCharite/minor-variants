@@ -105,7 +105,8 @@ class MinorVariantInfo():
         """
         return np.mean(self.coveragePerBase)
 
-    def richness(self, minCoverage=50, minFrequency=0.03):
+    def richness(self, minCoverage=50, minFrequency=0.03,
+                 printFrequencies=False):
         """
         Calculate the richness.
 
@@ -114,13 +115,18 @@ class MinorVariantInfo():
         @param minFrequency: A C{float} minimum frequency with which at least
             two nucleotides need to be present at a position for it to be
             considered variable.
+        @param printFrequencies: if C{True}, print the base frequencies for the
+            position that is a minor variant.
         """
-        richness = 0
+        richnessCount = 0
         for position in self.countsPerBase:
             if isMinorVariantPosition(self.countsPerBase[position],
                                       minCoverage, minFrequency):
-                richness += 1
-        return richness
+                richnessCount += 1
+                if printFrequencies:
+                    print('\t', position, self.countsPerBase[position],
+                          richnessCount)
+        return richnessCount
 
     def complexity(self, minCoverage=50, minFrequency=0.03):
         """
