@@ -71,11 +71,11 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
         for i, column in enumerate(sam.pileup(
                                    reference=referenceId,
                                    min_base_quality=minBaseQuality,
-                                   min_mapping_quality=minMappingQuality)):
+                                   min_mapping_quality=minMappingQuality,
+                                   ignore_overlap=False)):
             bases = Counter()
             for read in column.pileups:
-                if (not read.is_del and not read.is_refskip and
-                        samFilter.filterAlignment(read.alignment)):
+                if (not read.is_del and not read.is_refskip):
                     base = read.alignment.query_sequence[read.query_position]
                     bases[base] += 1
 
