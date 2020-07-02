@@ -176,7 +176,10 @@ class MinorVariantInfo():
         for position in range(len(self.countsPerBase)):
             alleles = [0, 0, 0, 0]
             for base, count in self.countsPerBase[position].items():
-                alleles[bToC[base]] += count
+                try:
+                    alleles[bToC[base]] += count
+                except KeyError:
+                    continue
             allelArray.append(alleles)
 
         return allel.AlleleCountsArray(allelArray)
