@@ -64,6 +64,15 @@ def getCodonAtPosition(position, nt, virus):
         return codons[codonPosition], newCodons[codonPosition]
 
 
+def codonPosition(codon1, codon2):
+    """
+    Get the codon position of a mutation.
+    """
+    for i, bases in enumerate(zip(codon1, codon2)):
+        if len(set(bases)) != 1:
+            return i + 1
+
+
 def isNS(position, nt, virus):
     """
     Return true if a change at a position is non-synonymous.
