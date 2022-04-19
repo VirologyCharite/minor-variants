@@ -17,6 +17,9 @@ def isMinorVariantPosition(bases, minDepth, minFrequency):
     """
     baseCount = sum(list(bases.values()))
 
+    if baseCount == 0:
+        return False
+
     if baseCount >= minDepth:
         if len(bases.keys()) == 1:
             return False
@@ -57,7 +60,7 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
     with samfile(bamFile) as sam:
         if samFilter.referenceIds:
             # No need to check if the given reference id is in referenceLengths
-            # because the samFilter.referenceLengths call above catched that.
+            # because the samFilter.referenceLengths call above caught that.
             referenceId = samFilter.referenceIds.pop()
         else:
             if len(referenceLengths) == 1:
@@ -78,6 +81,8 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
                 if (not read.is_del and not read.is_refskip):
                     base = read.alignment.query_sequence[read.query_position]
                     bases[base] += 1
+                elif read.is_del:
+                    bases['-'] += 1
 
             result[column.reference_pos] = bases
 

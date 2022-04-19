@@ -47,9 +47,8 @@ class MinorVariantInfo():
                 self.minMappingQuality = params['minMappingQuality']
             self.name = jsonFile.split('/')[-1].split('.')[0]
         elif bamFile:
-            self.countsPerBase = getBaseFrequencies(bamFile,
-                                                    self.minBaseQuality,
-                                                    self.minMappingQuality)
+            self.countsPerBase = getBaseFrequencies(
+                bamFile, self.minBaseQuality, self.minMappingQuality)
             self.name = bamFile.split('/')[-1].split('.')[0]
             self.sequencingTech = sequencingTech
         else:
@@ -64,9 +63,9 @@ class MinorVariantInfo():
 
         self.length = len(self.coveragePerBase)
 
-        self.maxFreqPerBase = []
-        for i in range(max(self.countsPerBase) + 1):
-            bases = list(self.countsPerBase[i].values())
+        self.maxFreqPerBase = {}
+        for position in self.countsPerBase:
+            bases = list(self.countsPerBase[position].values())
             if bases:
                 try:
                     frequency = max(bases) / sum(bases)
@@ -74,7 +73,7 @@ class MinorVariantInfo():
                     frequency = 0.0
             else:
                 frequency = 0.0
-            self.maxFreqPerBase.append(frequency)
+            self.maxFreqPerBase[position] = frequency
 
         assert self.length == len(self.countsPerBase)
 
@@ -142,9 +141,11 @@ class MinorVariantInfo():
         for position in self.countsPerBase:
             if isMinorVariantPosition(self.countsPerBase[position],
                                       minCoverage, minFrequency):
-                freq = self.maxFreqPerBase[position]
-                shannonEntropy = (-(freq * np.log(freq)) +
-                                  (1 - freq) * np.log(1 - freq)) / (np.log(2))
+                totalBases = sum(self.countsPerBase[position].values())
+                shannonEntropy = 0
+                for base in self.countsPerBase[position]:
+                    freq = self.countsPerBase[position][base] / totalBases
+                    shannonEntropy += (-freq * np.log(freq))
                 shannonEntropies.append(shannonEntropy)
         return np.mean(shannonEntropies)
 
@@ -159,14 +160,18 @@ class MinorVariantInfo():
             considered variable.
         """
         distance = 0
-        for position in self.countsPerBase:
-            if isMinorVariantPosition(self.countsPerBase[position],
+        for p in self.countsPerBase:
+            if isMinorVariantPosition(self.countsPerBase[p],
                                       minCoverage, minFrequency):
-                distance += self.maxFreqPerBase[position]
+                totalBases = sum(list(self.countsPerBase[p].values()))
+                frequencies = sorted([self.countsPerBase[p][b] / totalBases for
+                                      b in self.countsPerBase[p]],
+                                     reverse=True)
+                distance += frequencies[1]
 
         return distance
 
-    def allelArray(self):
+    def allelArray(self, minCoverage):
         """
         Return an array as used by scikit-allel.
         """
@@ -175,16 +180,20 @@ class MinorVariantInfo():
         allelArray = []
         for position in range(len(self.countsPerBase)):
             alleles = [0, 0, 0, 0]
-            for base, count in self.countsPerBase[position].items():
-                try:
-                    alleles[bToC[base]] += count
-                except KeyError:
-                    continue
-            allelArray.append(alleles)
+            if (not minCoverage or (minCoverage and sum(
+                    self.countsPerBase[position].values()) >= minCoverage)):
+                for base, count in self.countsPerBase[position].items():
+                    try:
+                        alleles[bToC[base]] += count
+                    except KeyError:
+                        continue
+                allelArray.append(alleles)
 
-        return allel.AlleleCountsArray(allelArray)
+        if allelArray:
+            return allel.AlleleCountsArray(allelArray)
 
-    def nucleotideDiversity(self, perPosition=False, offsets=False):
+    def nucleotideDiversity(self, perPosition=False, offsets=False,
+                            minCoverage=False):
         """
         Calculate the nucleotide diversity pi.
 
@@ -193,24 +202,28 @@ class MinorVariantInfo():
             position.
         @param offsets: if not C{False} a C{tuple} of 0-based start, stop
             offsets between which the nucleotide diversity should be computed.
+        @param minCoverage: if not C{False}, the minimum number of reads
+            covering a position for it to be included in the calculation.
         """
         assert perPosition != offsets, ("Don't use 'perPosition' and "
                                         "'offsets' at the same time.")
 
-        alleleCountsArray = self.allelArray()
+        alleleCountsArray = self.allelArray(minCoverage=minCoverage)
 
-        if perPosition:
-            result = []
-            for position in range(self.length):
-                pi = allel.sequence_diversity(list(range(self.length)),
-                                              alleleCountsArray,
-                                              start=position, stop=position)
-                result.append(pi)
+        if alleleCountsArray:
+            if perPosition:
+                result = []
+                for position in range(self.length):
+                    pi = allel.sequence_diversity(list(range(self.length)),
+                                                  alleleCountsArray,
+                                                  start=position,
+                                                  stop=position)
+                    result.append(pi)
 
-        if offsets:
-            result = allel.sequence_diversity(list(range(self.length)),
-                                              alleleCountsArray,
-                                              start=offsets[0],
-                                              stop=offsets[1])
+            if offsets:
+                result = allel.sequence_diversity(list(range(self.length)),
+                                                  alleleCountsArray,
+                                                  start=offsets[0],
+                                                  stop=offsets[1])
 
-        return result
+            return result
