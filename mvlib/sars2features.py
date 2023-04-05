@@ -112,7 +112,8 @@ def getCodonAtPosition(position, nt, virus):
     if gene == 'UTR':
         return 'non-coding'
     elif gene == 'ORF1ab':
-        raise "Hoping this never happens"
+        # raise "Hoping this never happens"
+        return 'weird'
         # orf1aSequence = SARS2GENOME.sequence[265:13468]
         # orf1aCodons = [orf1aSequence[i:i + 3]
         #                for i in range(0, len(orf1aSequence), 3)]
@@ -152,6 +153,9 @@ def isNS(position, nt, virus):
 
     if result == 'non-coding':
         return ['non-coding', 'non-coding', position + 1]
+
+    if result == 'weird':
+        return ['weird', 'weird', 0]
 
     oldCodon, newCodon, position = result
 

@@ -75,7 +75,8 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
                                    reference=referenceId,
                                    min_base_quality=minBaseQuality,
                                    min_mapping_quality=minMappingQuality,
-                                   ignore_overlap=False)):
+                                   ignore_overlap=False,
+                                   max_depth=1000000)):
             bases = Counter()
             for read in column.pileups:
                 if (not read.is_del and not read.is_refskip):
