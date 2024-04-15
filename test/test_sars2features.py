@@ -76,7 +76,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned.
         """
-        oldCodon, newCodon = getCodonAtPosition(265, 'A', 'SARS2')
+        oldCodon, newCodon, position = getCodonAtPosition(265, 'A', 'SARS2')
         self.assertEqual('ATG', oldCodon)
         self.assertEqual('ATG', newCodon)
 
@@ -84,7 +84,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned.
         """
-        oldCodon, newCodon = getCodonAtPosition(266, 'T', 'SARS2')
+        oldCodon, newCodon, position = getCodonAtPosition(266, 'T', 'SARS2')
         self.assertEqual('ATG', oldCodon)
         self.assertEqual('ATG', newCodon)
 
@@ -92,7 +92,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned.
         """
-        oldCodon, newCodon = getCodonAtPosition(267, 'G', 'SARS2')
+        oldCodon, newCodon, position = getCodonAtPosition(267, 'G', 'SARS2')
         self.assertEqual('ATG', oldCodon)
         self.assertEqual('ATG', newCodon)
 
@@ -100,7 +100,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned.
         """
-        oldCodon, newCodon = getCodonAtPosition(268, 'G', 'SARS2')
+        oldCodon, newCodon, position = getCodonAtPosition(268, 'G', 'SARS2')
         self.assertEqual('GAG', oldCodon)
         self.assertEqual('GAG', newCodon)
 
@@ -108,7 +108,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned in WNV.
         """
-        oldCodon, newCodon = getCodonAtPosition(96, 'A', 'WNV')
+        oldCodon, newCodon, position = getCodonAtPosition(96, 'A', 'WNV')
         self.assertEqual('ATG', oldCodon)
         self.assertEqual('ATG', newCodon)
 
@@ -116,7 +116,7 @@ class TestSARS2FeaturesGetCodonAtPosition(TestCase):
         """
         The correct codon must be returned.
         """
-        oldCodon, newCodon = getCodonAtPosition(118, 'A', 'YFV')
+        oldCodon, newCodon, position = getCodonAtPosition(118, 'A', 'YFV')
         self.assertEqual('ATG', oldCodon)
         self.assertEqual('ATG', newCodon)
 
@@ -129,10 +129,10 @@ class TestSARS2FeaturesIsNS(TestCase):
         """
         If a mutation is non-synonymous, return correctly
         """
-        self.assertTrue(isNS(265, 'C', 'SARS2'))
+        self.assertEqual(['start', 'L', 1], isNS(265, 'C', 'SARS2'))
 
     def testIsNSFalse(self):
         """
         If a mutation is synonymous, return correctly
         """
-        self.assertFalse(isNS(265, 'A', 'SARS2'))
+        self.assertEqual([False, False, 1], isNS(265, 'A', 'SARS2'))

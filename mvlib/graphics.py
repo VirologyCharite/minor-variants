@@ -44,18 +44,12 @@ def plotFrequencies(minorVariantInfo, positions, outFilename=None, ax=None,
     @param plotFurinAAs: If C{True} plot the furin cleavage site amino acids
         at the bottom of the plot.
     """
-    ind = np.arange(len(positions))
     width = 0.5
 
     furinSeq = 'GGTATATGCGCTAGTTATCAGACTCAGACTAATTCTCCTCGGCGGGCACGTAGTGTAGCT'
 
     if not ax:
         fig, ax = plt.subplots(1, 1, figsize=(16, 3.75))
-
-    # aFreqs = []
-    # tFreqs = []
-    # cFreqs = []
-    # gFreqs = []
 
     coverage = []
 
@@ -106,17 +100,6 @@ def plotFrequencies(minorVariantInfo, positions, outFilename=None, ax=None,
         ax.bar(i, gFreqs, width,
                bottom=[i + j + k for i, j, k in zip(aFreqs, tFreqs, cFreqs)],
                facecolor=NTCOLORS['G'], edgecolor=NTCOLORS['G'], alpha=gAlpha)
-
-    # ax.bar(ind, aFreqs, width, facecolor=NTCOLORS['A'],
-    #        edgecolor=NTCOLORS['A'])
-    # ax.bar(ind, tFreqs, width, bottom=aFreqs,
-    #        facecolor=NTCOLORS['T'], edgecolor=NTCOLORS['T'])
-    # ax.bar(ind, cFreqs, width,
-    #        bottom=[i + j for i, j in zip(aFreqs, tFreqs)],
-    #        facecolor=NTCOLORS['C'], edgecolor=NTCOLORS['C'])
-    # ax.bar(ind, gFreqs, width,
-    #        bottom=[i + j + k for i, j, k in zip(aFreqs, tFreqs, cFreqs)],
-    #        facecolor=NTCOLORS['G'], edgecolor=NTCOLORS['G'])
 
     ax.hlines(y=0.5, xmin=-0.5, xmax=len(positions), linestyle=':')
 

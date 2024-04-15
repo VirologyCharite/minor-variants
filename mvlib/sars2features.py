@@ -90,9 +90,12 @@ def getGene(position, virus):
     """
     Get the gene a particular position is in.
 
-    @param position: The C{int} 0-based offset off a position in the SARS2
+    @param position: The C{int} 0-based offset off a position in the virus
         genome.
     """
+    assert virus in {'SARS2', 'WNV', 'YFV'}, ('"virus" must be one of '
+                                              '"SARS2", "WNV", "YFV".')
+
     if virus == 'SARS2' and position in (13467, 13468):
         return 'ORF1ab'
     else:
@@ -105,23 +108,23 @@ def getGene(position, virus):
 
 def getCodonAtPosition(position, nt, virus):
     """
-    Get the codon that a particular position is in.
+    Get the codon that a particular nucleotide position is in.
+
+    @param position: The zero-based nucleotide position in a sequence.
+    @param nt: The nucleotide that is in a codon.
+    @param virus: Which virus should be considered. Must be one of ('SARS2',
+        'WNV', 'YFV').
     """
+    assert virus in {'SARS2', 'WNV', 'YFV'}, ('"virus" must be one of '
+                                              '"SARS2", "WNV", "YFV".')
+
     gene = getGene(position, virus)
 
     if gene == 'UTR':
         return 'non-coding'
     elif gene == 'ORF1ab':
-        # raise "Hoping this never happens"
+        # This is related to the slipping in SARS2 ORF1ab.
         return 'weird'
-        # orf1aSequence = SARS2GENOME.sequence[265:13468]
-        # orf1aCodons = [orf1aSequence[i:i + 3]
-        #                for i in range(0, len(orf1aSequence), 3)]
-        # orf1aPos = position - 265
-        # orf1bSequence = SARS2GENOME.sequence[13467:21555]
-        # corf1bCodons = [orf1bSequence[i:i + 3]
-        #                 for i in range(0, len(orf1bSequence), 3)]
-        # orf1bPos = position - 13467
     else:
         ntSequence = VI[virus]['g'].sequence[VI[virus]['o'][gene][0]:
                                              VI[virus]['o'][gene][1]]
@@ -146,6 +149,11 @@ def codonPosition(codon1, codon2):
 def isNS(position, nt, virus):
     """
     Return true if a change at a position is non-synonymous.
+
+    @param position: The zero-based nucleotide position in a sequence.
+    @param nt: The nucleotide that is in a codon.
+    @param virus: Which virus should be considered. Must be one of ('SARS2',
+        'WNV', 'YFV').
     """
     assert virus in {'SARS2', 'WNV', 'YFV'}, ('"virus" must be one of '
                                               '"SARS2", "WNV", "YFV".')
@@ -163,9 +171,3 @@ def isNS(position, nt, virus):
         return [codons_to_aa[oldCodon], codons_to_aa[newCodon], position + 1]
     else:
         return [False, False, position + 1]
-
-    # if CODONSTOAA[oldCodon] != CODONSTOAA[newCodon]:
-    #     # print('\t', CODONSTOAA[oldCodon], CODONSTOAA[newCodon])
-    #     return [oldCodon, newCodon, position + 1]
-    # else:
-    #     return [False, False, False]
