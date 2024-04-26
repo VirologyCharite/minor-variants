@@ -23,10 +23,12 @@ class MinorVariantInfo():
     @param sequencingTech: The sequencing technology that was used to create
         the bam file. Should be one of 'Unknown', 'MiSeq', 'NextSeq',
         'NovaSeq'.
+    @param referenceId: The Id of the reference sequence to use. In case a BAM
+        file contains multiple references.
     """
     def __init__(self, bamFile=None, jsonFile=None, frequenciesDict=False,
                  minBaseQuality=None, minMappingQuality=None,
-                 sequencingTech=None):
+                 sequencingTech=None, referenceId=False):
 
         self.minBaseQuality = minBaseQuality if minBaseQuality else 0
         self.minMappingQuality = minMappingQuality if minMappingQuality else 0
@@ -48,7 +50,8 @@ class MinorVariantInfo():
             self.name = jsonFile.split('/')[-1].split('.')[0]
         elif bamFile:
             self.countsPerBase = getBaseFrequencies(
-                bamFile, self.minBaseQuality, self.minMappingQuality)
+                bamFile, self.minBaseQuality, self.minMappingQuality,
+                referenceId=referenceId)
             self.name = bamFile.split('/')[-1].split('.')[0]
             self.sequencingTech = sequencingTech
         else:
@@ -96,7 +99,7 @@ class MinorVariantInfo():
             with open(outFilename, 'w') as fp:
                 json.dump(data, fp)
         else:
-            json.dump(data, sys.stdout)
+            json.dump(data, sys.stdout, indent=4, sort_keys=True)
 
     def meanCoverage(self):
         """
