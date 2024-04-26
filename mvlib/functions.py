@@ -38,7 +38,8 @@ def isMinorVariantPosition(bases, minDepth, minFrequency):
         return False
 
 
-def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
+def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0,
+                       referenceId=False):
     """
     Takes a bam file and returns a dictionary where the key maps to a position
     and the values map to a Counter with the number of each base at that
@@ -48,6 +49,8 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
     @param minBaseQuality: Minimum base quality. Bases below the minimum
         quality will not be output.
     @param minMappingQuality: Only use reads above a minimum mapping quality.
+    @param referenceId: The Id of the reference sequence to use. In case a BAM
+        file contains multiple references.
     """
     reads = Reads().filter()
 
@@ -58,18 +61,20 @@ def getBaseFrequencies(bamFile, minBaseQuality=0, minMappingQuality=0):
     result = {}
 
     with samfile(bamFile) as sam:
-        if samFilter.referenceIds:
-            # No need to check if the given reference id is in referenceLengths
-            # because the samFilter.referenceLengths call above caught that.
-            referenceId = samFilter.referenceIds.pop()
-        else:
-            if len(referenceLengths) == 1:
-                referenceId = list(referenceLengths)[0]
+        if not referenceId:
+            if samFilter.referenceIds:
+                # No need to check if the given reference id is in
+                # referenceLengths because the samFilter.referenceLengths call
+                # above caught that.
+                referenceId = samFilter.referenceIds.pop()
             else:
-                print('SAM file %r contains %d references (%s). Only one '
-                      'reference id can be analyzed at a time.' % (
-                          bamFile, len(referenceLengths),
-                          ', '.join(sorted(referenceLengths))))
+                if len(referenceLengths) == 1:
+                    referenceId = list(referenceLengths)[0]
+                else:
+                    print('SAM file %r contains %d references (%s). Only one '
+                          'reference id can be analyzed at a time.' % (
+                              bamFile, len(referenceLengths),
+                              ', '.join(sorted(referenceLengths))))
 
         for i, column in enumerate(sam.pileup(
                                    reference=referenceId,
