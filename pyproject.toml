@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mvlib"
+version = "0.1.0"
+description = "Minor variant analysis from BAM files"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "biopython>=1.71",
+    "bz2file>=0.98",
+    "cachetools>=3.1.0",
+    "matplotlib>=1.4.3",
+    "mysql-connector-python==9.1.0",
+    "numpy>=1.14.2",
+    "pyfaidx>=0.5.0",
+    "pysam>=0.15.2",
+    "requests>=2.18.4",
+    "simplejson>=3.5.3",
+    "six>=1.11.0",
+    "dark-matter",
+    "scikit-allel",
+]
+
+[project.urls]
+Repository = "https://github.com/VirologyCharite/minor-variants"
+
